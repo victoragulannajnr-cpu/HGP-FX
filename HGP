@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HGP FX | Next-Gen Crypto Allocation Terminal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-slate-950 text-slate-100 font-sans min-h-screen relative overflow-x-hidden">
+
+    <div id="authModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/95 backdrop-blur-md">
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-md p-6 md:p-8 rounded-3xl shadow-2xl space-y-6">
+            <div class="text-center space-y-2">
+                <div class="inline-block bg-amber-500/10 border border-amber-500/30 text-amber-400 px-3 py-1 rounded-full font-bold tracking-widest text-[10px] uppercase">HGP FX SECURE</div>
+                <h2 class="text-2xl font-extrabold text-white tracking-tight">Access Terminal</h2>
+                <p class="text-xs text-slate-400">Initialize secure network sockets to manage decentralized yield pipelines.</p>
+            </div>
+
+            <div class="flex bg-slate-950 p-1 rounded-xl border border-slate-800">
+                <button onclick="toggleAuthMode('login')" id="tabLogin" class="w-1/2 text-center py-2 text-xs font-bold rounded-lg transition bg-amber-500 text-slate-950">LOG IN</button>
+                <button onclick="toggleAuthMode('signup')" id="tabSignup" class="w-1/2 text-center py-2 text-xs font-bold rounded-lg transition text-slate-400 hover:text-white">REGISTER</button>
+            </div>
+
+            <form onsubmit="handleAuthGateway(event)" class="space-y-4">
+                <div id="signupField" class="hidden">
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Account Holder Full Name</label>
+                    <input id="authName" type="text" placeholder="John Doe" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-white focus:outline-none focus:border-amber-500 text-sm">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Network Identity Handle (Email)</label>
+                    <input id="authEmail" type="email" required placeholder="operator@hgpfx.com" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-white focus:outline-none focus:border-amber-500 text-sm font-mono">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Encrypted Pass-Token</label>
+                    <input id="authPassword" type="password" required placeholder="••••••••" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-white focus:outline-none focus:border-amber-500 text-sm">
+                </div>
+                <button type="submit" id="authSubmitBtn" class="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-extrabold py-3 rounded-xl transition text-xs tracking-wider uppercase shadow-lg shadow-amber-500/10">
+                    Establish Session Router
+                </button>
+
+                <div class="relative flex py-2 items-center">
+                    <div class="flex-grow border-t border-slate-800"></div>
+                    <span class="flex-shrink mx-4 text-[10px] text-slate-500 font-bold tracking-widest uppercase">Or Connect Via</span>
+                    <div class="flex-grow border-t border-slate-800"></div>
+                </div>
+
+                <button type="button" onclick="handleGoogleSignIn()" class="w-full bg-slate-950 hover:bg-slate-800 border border-slate-800 text-white font-bold py-3 rounded-xl transition text-xs tracking-wider uppercase flex items-center justify-center space-x-2">
+                    <i class="fa-brands fa-google text-amber-500 text-sm"></i>
+                    <span>Authenticate via Google</span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div id="appContainer" class="filter blur-md pointer-events-none transition duration-300">
+        
+        <nav class="bg-slate-900 border-b border-slate-800 px-6 py-4 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <div class="bg-gradient-to-br from-amber-500 to-orange-600 text-slate-950 font-black px-4 py-1.5 rounded-xl text-xl tracking-tighter shadow-md shadow-amber-500/10">HGP FX</div>
+                <span class="text-xs font-bold tracking-[0.25em] text-slate-400 hidden sm:inline">QUANTUM ALLOCATION MATRIX</span>
+            </div>
+            <div class="flex items-center space-x-4">
+                <div class="text-xs text-right hidden md:block">
+                    <p class="text-slate-500 font-medium">Session Route</p>
+                    <p id="activeUserDisplay" class="text-slate-300 font-mono">unresolved@hgpfx.io</p>
+                </div>
+                <button onclick="triggerLogoutSession()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-2 rounded-xl text-xs transition" title="Disconnect Session">
+                    <i class="fa-solid fa-power-off"></i>
+                </button>
+            </div>
+        </nav>
+
+        <div class="max-w-7xl mx-auto p-4 md:p-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
+            
+            <div class="lg:col-span-2 space-y-8">
+                
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div class="bg-slate-900 p-6 rounded-2xl border border-slate-800">
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Net Asset Valuation (NAV)</p>
+                        <h3 id="cardTotalValue" class="text-3xl font-black text-white">$0.00</h3>
+                        <p class="text-[10px] text-amber-500 mt-2"><i class="fa-solid fa-wallet mr-1"></i> Available Transfer Capital</p>
+                    </div>
+                    <div class="bg-slate-900 p-6 rounded-2xl border border-slate-800">
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Active Vault Commitments</p>
+                        <h3 id="cardActiveDeposits" class="text-3xl font-black text-white">$0.00</h3>
+                        <p id="cardPlanCount" class="text-[10px] text-slate-500 mt-2">0 Yield Pipelines Engaged</p>
+                    </div>
+                    <div class="bg-slate-900 p-6 rounded-2xl border border-slate-800">
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Accumulated Harvested Yield</p>
+                        <h3 id="cardTotalYield" class="text-3xl font-black text-amber-400">+$0.00</h3>
+                        <p class="text-[10px] text-slate-500 mt-2">Accruing platform dividends</p>
+                    </div>
+                </div>
+
+                <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800 flex flex-wrap gap-4 items-center justify-between">
+                    <div class="text-xs text-slate-400">
+                        <span class="text-white font-bold block uppercase tracking-wider">Gateway Actions</span>
+                        Execute transfers directly in or out of the clearing network protocol.
+                    </div>
+                    <div class="flex space-x-3 w-full sm:w-auto">
+                        <button onclick="openTransactionModal('deposit')" class="flex-1 sm:flex-initial bg-amber-500 hover:bg-amber-600 text-slate-950 font-extrabold px-6 py-2.5 rounded-xl text-xs uppercase tracking-wider transition">
+                            <i class="fa-solid fa-circle-arrow-down mr-1"></i> Deposit
+                        </button>
+                        <button onclick="openTransactionModal('withdraw')" class="flex-1 sm:flex-initial bg-slate-800 hover:bg-slate-700 text-white border border-slate-700 font-extrabold px-6 py-2.5 rounded-xl text-xs uppercase tracking-wider transition">
+                            <i class="fa-solid fa-circle-arrow-up mr-1"></i> Withdraw
+                        </button>
+                    </div>
+                </div>
+
+                <div class="bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden">
+                    <div class="p-6 border-b border-slate-800 flex justify-between items-center bg-slate-900/50">
+                        <div>
+                            <h2 class="text-sm font-extrabold text-white uppercase tracking-wider">Strategic Deployment Models</h2>
+                            <p class="text-xs text-slate-400">Select premium risk/reward profiles to route mining algorithms.</p>
+                        </div>
+                        <i class="fa-solid fa-layer-group text-amber-500 text-lg"></i>
+                    </div>
+                    
+                    <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="bg-slate-950 border border-slate-800 p-5 rounded-xl space-y-4 hover:border-amber-500/20 transition">
+                            <div class="flex justify-between items-start">
+                                <span id="plan1Name" class="text-xs font-bold text-white uppercase tracking-widest">Micro Core Float</span>
+                                <span id="plan1RateDisplay" class="bg-amber-500/10 text-amber-400 text-[10px] font-bold px-2 py-0.5 rounded">6% Monthly</span>
+                            </div>
+                            <div class="flex justify-between items-center pt-2">
+                                <div>
+                                    <p class="text-[9px] uppercase text-slate-500 font-bold tracking-wider">Floor Entry Requirement</p>
+                                    <p id="plan1MinDisplay" class="text-base font-black text-white">$500.00</p>
+                                </div>
+                                <button onclick="selectPlanToCalculate(1, 'Micro Core Float')" class="bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-700 font-bold px-3 py-1.5 rounded-lg text-[10px] uppercase tracking-wider transition">
+                                    Configure
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="bg-slate-950 border border-slate-800 p-5 rounded-xl space-y-4 hover:border-amber-500/20 transition">
+                            <div class="flex justify-between items-start">
+                                <span id="plan2Name" class="text-xs font-bold text-white uppercase tracking-widest">Macro Asset Growth</span>
+                                <span id="plan2RateDisplay" class="bg-amber-500/10 text-amber-400 text-[10px] font-bold px-2 py-0.5 rounded">9% Monthly</span>
+                            </div>
+                            <div class="flex justify-between items-center pt-2">
+                                <div>
+                                    <p class="text-[9px] uppercase text-slate-500 font-bold tracking-wider">Floor Entry Requirement</p>
+                                    <p id="plan2MinDisplay" class="text-base font-black text-white">$2,500.00</p>
+                                </div>
+                                <button onclick="selectPlanToCalculate(2, 'Macro Asset Growth')" class="bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-700 font-bold px-3 py-1.5 rounded-lg text-[10px] uppercase tracking-wider transition">
+                                    Configure
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="bg-slate-950 border border-slate-800 p-5 rounded-xl space-y-4 hover:border-amber-500/20 transition">
+                            <div class="flex justify-between items-start">
+                                <span id="plan3Name" class="text-xs font-bold text-white uppercase tracking-widest">Apex Yield Pool</span>
+                                <span id="plan3RateDisplay" class="bg-amber-500/10 text-amber-400 text-[10px] font-bold px-2 py-0.5 rounded">12% Monthly</span>
+                            </div>
+                            <div class="flex justify-between items-center pt-2">
+                                <div>
+                                    <p class="text-[9px] uppercase text-slate-500 font-bold tracking-wider">Floor Entry Requirement</p>
+                                    <p id="plan3MinDisplay" class="text-base font-black text-white">$10,000.00</p>
+                                </div>
+                                <button onclick="selectPlanToCalculate(3, 'Apex Yield Pool')" class="bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-700 font-bold px-3 py-1.5 rounded-lg text-[10px] uppercase tracking-wider transition">
+                                    Configure
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="bg-slate-950 border border-slate-800 p-5 rounded-xl space-y-4 hover:border-amber-500/20 transition">
+                            <div class="flex justify-between items-start">
+                                <span id="plan4Name" class="text-xs font-bold text-white uppercase tracking-widest">Quantum Sovereign</span>
+                                <span id="plan4RateDisplay" class="bg-amber-500/10 text-amber-400 text-[10px] font-bold px-2 py-0.5 rounded">16% Monthly</span>
+                            </div>
+                            <div class="flex justify-between items-center pt-2">
+                                <div>
+                                    <p class="text-[9px] uppercase text-slate-500 font-bold tracking-wider">Floor Entry Requirement</p>
+                                    <p id="plan4MinDisplay" class="text-base font-black text-white">$25,000.00</p>
+                                </div>
+                                <button onclick="selectPlanToCalculate(4, 'Quantum Sovereign')" class="bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-700 font-bold px-3 py-1.5 rounded-lg text-[10px] uppercase tracking-wider transition">
+                                    Configure
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-slate-900 p-6 rounded-2xl border border-slate-800 space-y-6">
+                    <div class="flex items-center space-x-3">
+                        <div class="p-2 bg-amber-500/10 rounded-lg text-amber-400"><i class="fa-solid fa-sliders"></i></div>
+                        <div>
+                            <h3 class="font-extrabold text-white text-sm uppercase tracking-wide">Allocation Deployment Module</h3>
+                            <p class="text-xs text-slate-400">Map precise financial limits to generate instant forward projections.</p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Active Target Plan</label>
+                            <input id="calcPlanName" type="text" readonly value="Micro Core Float" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-slate-500 text-sm font-mono focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Contract Capital Size ($)</label>
+                            <input id="calcAmount" type="number" value="500" oninput="runActiveCalculation()" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-3 text-white text-sm font-mono focus:outline-none focus:border-amber-500">
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 flex justify-between items-center text-center">
+                        <div class="w-1/2 border-r border-slate-800">
+                            <p class="text-[9px] text-slate-500 font-bold uppercase tracking-widest">Estimated Monthly Yield</p>
+                            <p id="calcMonthlyYield" class="text-lg font-bold text-amber-400">$0.00</p>
+                        </div>
+                        <div class="w-1/2">
+                            <p class="text-[9px] text-slate-500 font-bold uppercase tracking-widest">Annual Compound Valuation</p>
+                            <p id="calcYearlyYield" class="text-lg font-bold text-white">$0.00</p>
+                        </div>
+                    </div>
+
+                    <button onclick="commitInvestmentToLedger()" class="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-extrabold py-3 rounded-xl transition text-sm tracking-wide shadow-md shadow-amber-500/5">
+                        Lock Capital Into Yield Pipeline
+                    </button>
+                </div>
+
+            </div>
+
+            <div class="space-y-6">
+                
+                <div class="bg-gray-900 p-6 rounded-2xl border border-gray-800 space-y-4">
+                    <h3 class="text-sm font-bold text-white uppercase tracking-wider"><i class="fa-solid fa-chart-line text-amber-500 mr-2"></i>Live Protocol Rates</h3>
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center p-3 bg-gray-950 rounded-xl border border-gray-800">
+                            <div class="flex items-center space-x-2">
+                                <i class="fa-brands fa-bitcoin text-amber-500 text-xl"></i>
+                                <span class="text-xs font-semibold">Bitcoin (BTC)</span>
+                            </div>
+                            <div class="text-right text-xs"><p class="font-bold">$94,250.00</p><p class="text-[10px] text-emerald-400">+1.85%</p></div>
+                        </div>
+                        <div class="flex justify-between items-center p-3 bg-gray-950 rounded-xl border border-gray-800">
+                            <div class="flex items-center space-x-2">
+                                <i class="fa-brands fa-ethereum text-indigo-400 text-xl"></i>
+                                <span class="text-xs font-semibold">Ethereum (ETH)</span>
+                            </div>
+                            <div class="text-right text-xs"><p class="font-bold">$3,420.15</p><p class="text-[10px] text-red-400">-0.42%</p></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-slate-900 p-6 rounded-2xl border border-slate-800 space-y-4">
+                    <h3 class="text-xs font-bold text-white uppercase tracking-widest"><i class="fa-solid fa-receipt text-slate-400 mr-2"></i>Recent Terminal Events</h3>
+                    <div id="ledgerActivityLogs" class="text-[11px] font-mono text-slate-400 space-y-2 max-h-[180px] overflow-y-auto">
+                        <p class="text-slate-500 italic">No historical activities located on standard node connection stack.</p>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <div id="txModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md">
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-md p-6 rounded-2xl space-y-4">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                <h3 id="txModalTitle" class="text-sm font-bold uppercase tracking-wider text-white">Deposit Routing Gate</h3>
+                <button onclick="closeTransactionModal()" class="text-slate-400 hover:text-white text-sm"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            
+            <div id="depositForm" class="hidden space-y-4">
+                <p class="text-xs text-slate-400 leading-relaxed">Forward your assets directly to our central clearing layout token address. Transfers confirm inside 3 network updates.</p>
+                
+                <div class="bg-slate-950 border border-slate-800 p-3 rounded-xl space-y-1">
+                    <span class="text-[9px] uppercase tracking-wider text-amber-400 font-bold">Network Core Address (USDT / BTC)</span>
+                    <p id="platformWalletString" class="text-xs font-mono font-bold text-white break-all select-all bg-slate-900 p-2 rounded border border-slate-800">TBjwnNgvoDZbprjEvKiznTUMgCcwKnF3NR</p>
+                    <p class="text-[9px] text-slate-500 italic"><i class="fa-solid fa-copy mr-1"></i> Double-click or click-hold raw string row to isolate copy selection.</p>
+                </div>
+
+                <div class="space-y-1">
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest">Amount Dispatched ($)</label>
+                    <input id="depositTxVal" type="number" placeholder="1000" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-white text-xs font-mono focus:outline-none">
+                </div>
+                <button onclick="executeWalletDepositReceipt()" class="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold py-2.5 rounded-xl text-xs uppercase tracking-wider transition">
+                    Log Deposit Notification Ticket
+                </button>
+            </div>
+
+            <div id="withdrawForm" class="hidden space-y-4">
+                <p class="text-xs text-slate-400 leading-relaxed">Extract liquid asset fields directly back to your private operational nodes.</p>
+                <div class="space-y-2">
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Target Settlement Address</label>
+                        <input id="withdrawTxAddress" type="text" placeholder="0x..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-white text-xs font-mono focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Amount to Liquidate ($)</label>
+                        <input id="withdrawTxVal" type="number" placeholder="500" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-white text-xs font-mono focus:outline-none">
+                    </div>
+                </div>
+                <button onclick="executeWalletWithdrawalProcessing()" class="w-full bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white font-bold py-2.5 rounded-xl text-xs uppercase tracking-wider transition">
+                    Initiate Wire Outlay Sequence
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { 
+            getAuth, 
+            createUserWithEmailAndPassword, 
+            signInWithEmailAndPassword, 
+            sendEmailVerification,
+            signOut,
+            onAuthStateChanged,
+            GoogleAuthProvider,
+            signInWithPopup
+        } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import {
+            getFirestore,
+            doc,
+            getDoc,
+            setDoc,
+            updateDoc
+        } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        // LINE 21: Integrated Custom Production App Configuration Keys
+        const firebaseConfig = {
+            apiKey: "AIzaSyCtoiW1NHspBo_6MjXO78EGw_6YdqUsUT8",
+            authDomain: "hgp-c05f0.firebaseapp.com",
+            projectId: "hgp-c05f0",
+            storageBucket: "hgp-c05f0.firebasestorage.app",
+            messagingSenderId: "1088149038683",
+            appId: "1:1088149038683:web:6a169b626552158642417e",
+            measurementId: "G-J5J2S4834M"
+        };
+
+        // Initialize Firebase Services
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const googleProvider = new GoogleAuthProvider();
+
+        // Global UI State Management Object
+        let isSignupActive = false;
+        let currentUser = null;
+        let systemState = {
+            activePlanId: 1,
+            userLedgerBalance: 0.00,
+            userLedgerYield: 0.00,
+            activeContractsCount: 0,
+            plans: {
+                1: { name: "Micro Core Float", minDeposit: 500, monthlyRate: 0.06 },
+                2: { name: "Macro Asset Growth", minDeposit: 2500, monthlyRate: 0.09 },
+                3: { name: "Apex Yield Pool", minDeposit: 10000, monthlyRate: 0.12 },
+                4: { name: "Quantum Sovereign", minDeposit: 25000, monthlyRate: 0.16 }
+            }
+        };
+
+        // Database Sync Helper: Pulls data from Firestore Cloud to UI
+        async function fetchUserLedgerProfile(user) {
+            try {
+                const userDocRef = doc(db, "users", user.uid);
+                const userDocSnap = await getDoc(userDocRef);
+
+                if (userDocSnap.exists()) {
+                    const cloudData = userDocSnap.data();
+                    systemState.userLedgerBalance = cloudData.userLedgerBalance || 0.00;
+                    systemState.userLedgerYield = cloudData.userLedgerYield || 0.00;
+                    systemState.activeContractsCount = cloudData.activeContractsCount || 0;
+                } else {
+                    const initialProfile = {
+                        email: user.email,
+                        userLedgerBalance: 0.00,
+                        userLedgerYield: 0.00,
+                        activeContractsCount: 0,
+                        accountCreated: new Date().toISOString()
+                    };
+                    await setDoc(userDocRef, initialProfile);
+                    systemState.userLedgerBalance = 0.00;
+                    systemState.userLedgerYield = 0.00;
+                    systemState.activeContractsCount = 0;
+                }
+                updateInterfaceLedgerCards();
+            } catch (error) {
+                console.error("Database Connection Sync Fault:", error);
+            }
+        }
+
+        // Database Sync Helper: Pushes balance adjustments up to Firestore Cloud
+        async function saveUserLedgerProfile() {
+            if (!currentUser) return;
+            try {
+                const userDocRef = doc(db, "users", currentUser.uid);
+                await updateDoc(userDocRef, {
+                    userLedgerBalance: systemState.userLedgerBalance,
+                    userLedgerYield: systemState.userLedgerYield,
+                    activeContractsCount: systemState.activeContractsCount
+                });
+            } catch (error) {
+                console.error("Database Write Pipeline Fault:", error);
+            }
+        }
+
+        // Handle Login/Registration Navigation Tabs Toggle
+        window.toggleAuthMode = function(targetMode) {
+            const signupField = document.getElementById('signupField');
+            const authSubmitBtn = document.getElementById('authSubmitBtn');
+            const tabLogin = document.getElementById('tabLogin');
+            const tabSignup = document.getElementById('tabSignup');
+
+            if(targetMode === 'signup') {
+                isSignupActive = true;
+                signupField.classList.remove('hidden');
+                authSubmitBtn.innerText = "Complete Node Registration";
+                tabSignup.className = "w-1/2 text-center py-2 text-xs font-bold rounded-lg transition bg-amber-500 text-slate-950";
+                tabLogin.className = "w-1/2 text-center py-2 text-xs font-bold rounded-lg transition text-slate-400 hover:text-white";
+            } else {
+                isSignupActive = false;
+                signupField.classList.add('hidden');
+                authSubmitBtn.innerText = "Establish Session Router";
+                tabLogin.className = "w-1/2 text-center py-2 text-xs font-bold rounded-lg transition bg-amber-500 text-slate-950";
+                tabSignup.className = "w-1/2 text-center py-2 text-xs font-bold rounded-lg transition text-slate-400 hover:text-white";
+            }
+        }
+
+        // Standard Email/Password Gateway Handler
+        window.handleAuthGateway = async function(event) {
+            event.preventDefault();
+            const email = document.getElementById('authEmail').value.trim();
+            const password = document.getElementById('authPassword').value;
+
+            if (isSignupActive) {
+                try {
+                    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                    await sendEmailVerification(userCredential.user);
+                    alert("Registration Complete! A verification link has been sent to your inbox. Please verify before logging in.");
+                    await signOut(auth);
+                    toggleAuthMode('login');
+                } catch (error) {
+                    alert("Registration Fault: " + error.message);
+                }
+            } else {
+                try {
+                    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                    if (!userCredential.user.emailVerified) {
+                        alert("Access Blocked: Your email address has not been verified yet.");
+                        await signOut(auth);
+                        return;
+                    }
+                    logSystemActivity("Terminal handshake success for " + userCredential.user.email);
+                } catch (error) {
+                    alert("Security Access Denied: " + error.message);
+                }
+            }
+        }
+
+        // Live Google Authentication Popup Router
+        window.handleGoogleSignIn = async function() {
+            try {
+                const result = await signInWithPopup(auth, googleProvider);
+                logSystemActivity("Google OAuth verification success for " + result.user.email);
+                alert("Secure Session Authorized via Google.");
+            } catch (error) {
+                alert("Google Authentication Cancelled: " + error.message);
+            }
+        }
+
+        // Active State Watcher: Monitors User Sessions Live
+        onAuthStateChanged(auth, async (user) => {
+            const authModal = document.getElementById('authModal');
+            const appContainer = document.getElementById('appContainer');
+            const activeUserDisplay = document.getElementById('activeUserDisplay');
+
+            if (user && user.emailVerified) {
+                currentUser = user;
+                activeUserDisplay.innerText = user.email;
+                
+                await fetchUserLedgerProfile(user);
+                
+                authModal.classList.add('hidden');
+                appContainer.classList.remove('filter', 'blur-md', 'pointer-events-none');
+                runActiveCalculation();
+            } else {
+                currentUser = null;
+                activeUserDisplay.innerText = "unresolved@hgpfx.io";
+                authModal.classList.remove('hidden');
+                appContainer.classList.add('filter', 'blur-md', 'pointer-events-none');
+            }
+        });
+
+        // Disconnect Current Authentication Session Route
+        window.triggerLogoutSession = async function() {
+            try {
+                await signOut(auth);
+                document.getElementById('authEmail').value = '';
+                document.getElementById('authPassword').value = '';
+                if(document.getElementById('authName')) document.getElementById('authName').value = '';
+                document.getElementById('ledgerActivityLogs').innerHTML = `<p class="text-slate-500 italic">No historical activities located on standard node connection stack.</p>`;
+            } catch (error) {
+                console.error("Logout Error:", error);
+            }
+        }
+
+        // Allocation Dynamic Calculations Modifiers
+        window.selectPlanToCalculate = function(planId, planLabel) {
+            systemState.activePlanId = planId;
+            document.getElementById('calcPlanName').value = planLabel;
+            document.getElementById('calcAmount').value = systemState.plans[planId].minDeposit;
+            runActiveCalculation();
+        }
+
+        window.runActiveCalculation = function() {
+            const chosenPlan = systemState.plans[systemState.activePlanId];
+            const currentInputValue = parseFloat(document.getElementById('calcAmount').value) || 0;
+            const computedMonthlyResult = currentInputValue * chosenPlan.monthlyRate;
+            const computedYearlyResult = currentInputValue + (computedMonthlyResult * 12);
+
+            document.getElementById('calcMonthlyYield').innerText = '$' + computedMonthlyResult.toLocaleString(undefined, {minimumFractionDigits: 2});
+            document.getElementById('calcYearlyYield').innerText = '$' + computedYearlyResult.toLocaleString(undefined, {minimumFractionDigits: 2});
+        }
+
+        window.commitInvestmentToLedger = async function() {
+            const targetTier = systemState.plans[systemState.activePlanId];
+            const allocationValue = parseFloat(document.getElementById('calcAmount').value) || 0;
+
+            if (systemState.userLedgerBalance < allocationValue) {
+                alert("Allocation Blocked: Available Net Asset Valuation (NAV) balance is insufficient. Please execute a pipeline deposit.");
+                return;
+            }
+            if (allocationValue < targetTier.minDeposit) {
+                alert("Limit Violation: Minimum configuration parameters require at least $" + targetTier.minDeposit + " to connect to this tier.");
+                return;
+            }
+
+            systemState.userLedgerBalance -= allocationValue;
+            systemState.userLedgerYield += (allocationValue * targetTier.monthlyRate);
+            systemState.activeContractsCount += 1;
+
+            updateInterfaceLedgerCards();
+            logSystemActivity("Locked $" + allocationValue.toLocaleString() + " to " + targetTier.name);
+            
+            await saveUserLedgerProfile();
+            alert("Success! Allocation locked into computing node channels.");
+        }
+
+        function updateInterfaceLedgerCards() {
+            const overallCumulativePortfolioValue = systemState.userLedgerBalance + systemState.userLedgerYield;
+            document.getElementById('cardActiveDeposits').innerText = '$' + systemState.userLedgerBalance.toLocaleString(undefined, {minimumFractionDigits: 2});
+            document.getElementById('cardTotalYield').innerText = '+$' + systemState.userLedgerYield.toLocaleString(undefined, {minimumFractionDigits: 2});
+            document.getElementById('cardTotalValue').innerText = '$' + overallCumulativePortfolioValue.toLocaleString(undefined, {minimumFractionDigits: 2});
+            document.getElementById('cardPlanCount').innerText = systemState.activeContractsCount + (systemState.activeContractsCount === 1 ? " Yield Pipeline Engaged" : " Yield Pipelines Engaged");
+        }
+
+        window.openTransactionModal = function(txType) {
+            document.getElementById('txModal').classList.remove('hidden');
+            if(txType === 'deposit') {
+                document.getElementById('txModalTitle').innerText = "Fund Liquidity Port Allocation";
+                document.getElementById('depositForm').classList.remove('hidden');
+                document.getElementById('withdrawForm').classList.add('hidden');
+            } else {
+                document.getElementById('txModalTitle').innerText = "Execute Network Outlay Sequence";
+                document.getElementById('depositForm').classList.add('hidden');
+                document.getElementById('withdrawForm').classList.remove('hidden');
+            }
+        }
+
+        window.closeTransactionModal = function() {
+            document.getElementById('txModal').classList.add('hidden');
+            document.getElementById('depositTxVal').value = '';
+            document.getElementById('withdrawTxVal').value = '';
+            document.getElementById('withdrawTxAddress').value = '';
+        }
+
+        window.executeWalletDepositReceipt = async function() {
+            const amt = parseFloat(document.getElementById('depositTxVal').value) || 0;
+            if(amt <= 0) {
+                alert("Please declare a comprehensive, non-zero financial asset payload size.");
+                return;
+            }
+            systemState.userLedgerBalance += amt;
+            updateInterfaceLedgerCards();
+            logSystemActivity("Inbound Ticket Logged: +$" + amt.toLocaleString());
+            closeTransactionModal();
+            
+            await saveUserLedgerProfile();
+            alert("Deposit ticket captured successfully. Balancing assets updates on internal ledger verification.");
+        }
+
+        window.executeWalletWithdrawalProcessing = async function() {
+            const amt = parseFloat(document.getElementById('withdrawTxVal').value) || 0;
+            const address = document.getElementById('withdrawTxAddress').value.trim();
+            
+            if(address === "") {
+                alert("Please define a standard target destination clearing layer address string.");
+                return;
+            }
+            if(amt <= 0 || amt > systemState.userLedgerBalance) {
+                alert("The withdrawal asset size input parameters fall outside your active available NAV clear-pool limits.");
+                return;
+            }
+            systemState.userLedgerBalance -= amt;
+            updateInterfaceLedgerCards();
+            logSystemActivity("Outbound Dispatched: -$" + amt.toLocaleString());
+            closeTransactionModal();
+            
+            await saveUserLedgerProfile();
+            alert("Liquidation process successfully queued into routing pipelines.");
+        }
+
+        function logSystemActivity(message) {
+            const container = document.getElementById('ledgerActivityLogs');
+            const timestamp = new Date().toLocaleTimeString();
+            if(container.innerHTML.includes("italic")) container.innerHTML = "";
+            
+            const row = document.createElement('p');
+            row.className = "border-b border-slate-900 pb-1 text-slate-300";
+            row.innerHTML = `<span class="text-amber-500 font-bold">[${timestamp}]</span> ${message}`;
+            container.prepend(row);
+        }
+
+        runActiveCalculation();
+    </script>
+</body>
+</html>
